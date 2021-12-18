@@ -16,7 +16,7 @@ class AppLayout extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         return Scaffold(
-          body: Center(child: Text('Moza')), /*GridView.builder(
+          body: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 2 / 3,
@@ -26,14 +26,22 @@ class AppLayout extends StatelessWidget {
             shrinkWrap: true,
             physics: const ClampingScrollPhysics(),
             padding: EdgeInsets.zero,
-            itemCount: AppCubit.get(context).characterModel.name.length,
+            itemCount: AppCubit
+                .get(context)
+                .characters
+                .length,
             itemBuilder: (context, index) {
-
+              return buildCharacterItem(AppCubit.get(context).characters[index]);
             },
-          ),*/
+          ),
           floatingActionButton: FloatingActionButton(
-            onPressed: (){
-
+            onPressed: () {
+              AppCubit
+                  .get(context)
+                  .getAllCharacters();
+              print(AppCubit
+                  .get(context)
+                  .characters.length);
             },
           ),
         );
@@ -41,53 +49,55 @@ class AppLayout extends StatelessWidget {
     );
   }
 }
- buildCharacterItem(CharacterModel character)=>Container(
-  width: double.infinity,
-  margin: EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
-  padding: EdgeInsetsDirectional.all(4),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(8),
-  ),
-  child: InkWell(
-    onTap: () {},
-    child: GridTile(
-      child: Hero(
-        tag: character.charId,
-        child: Container(
-          color: Colors.grey,
-          child: character.image.isNotEmpty
-              ? FadeInImage.assetNetwork(
-            width: double.infinity,
-            height: double.infinity,
-            placeholder: 'assets/images/loading.gif',
-            image: character.image,
-            fit: BoxFit.cover,
-          )
-              : Image.asset('assets/images/placeholder.jpg'),
-        ),
+
+buildCharacterItem(CharacterModel character) =>
+    Container(
+      width: double.infinity,
+      margin: EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
+      padding: EdgeInsetsDirectional.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
       ),
-      footer: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        color: Colors.black54,
-        alignment: Alignment.bottomCenter,
-        child: Text(
-          '${character.name}',
-          style: TextStyle(
-            height: 1.3,
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: () {},
+        child: GridTile(
+          child: Hero(
+            tag: character.charId,
+            child: Container(
+              color: Colors.grey,
+              child: character.image.isNotEmpty
+                  ? FadeInImage.assetNetwork(
+                width: double.infinity,
+                height: double.infinity,
+                placeholder: 'assets/images/loading.gif',
+                image: character.image,
+                fit: BoxFit.cover,
+              )
+                  : Image.asset('assets/images/placeholder.jpg'),
+            ),
           ),
-          overflow: TextOverflow.ellipsis,
-          maxLines: 2,
-          textAlign: TextAlign.center,
+          footer: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            color: Colors.black54,
+            alignment: Alignment.bottomCenter,
+            child: Text(
+              '${character.name}',
+              style: TextStyle(
+                height: 1.3,
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
       ),
-    ),
-  ),
-);
+    );
 
 Widget showLoadingIndicator() {
   return Center(
