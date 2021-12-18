@@ -16,6 +16,11 @@ class AppLayout extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         return Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+          title: Text('Characters'),
+            backgroundColor: Colors.yellow[700],
+          ),
           body: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -24,7 +29,7 @@ class AppLayout extends StatelessWidget {
               mainAxisSpacing: 1,
             ),
             shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             padding: EdgeInsets.zero,
             itemCount: AppCubit
                 .get(context)
@@ -34,17 +39,7 @@ class AppLayout extends StatelessWidget {
               return buildCharacterItem(AppCubit.get(context).characters[index]);
             },
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              AppCubit
-                  .get(context)
-                  .getAllCharacters();
-              print(AppCubit
-                  .get(context)
-                  .characters.length);
-            },
-          ),
-        );
+         );
       },
     );
   }
@@ -57,44 +52,54 @@ buildCharacterItem(CharacterModel character) =>
       padding: EdgeInsetsDirectional.all(4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(25),
       ),
       child: InkWell(
         onTap: () {},
-        child: GridTile(
-          child: Hero(
-            tag: character.charId,
-            child: Container(
-              color: Colors.grey,
-              child: character.image.isNotEmpty
-                  ? FadeInImage.assetNetwork(
-                width: double.infinity,
-                height: double.infinity,
-                placeholder: 'assets/images/loading.gif',
-                image: character.image,
-                fit: BoxFit.cover,
-              )
-                  : Image.asset('assets/images/placeholder.jpg'),
-            ),
-          ),
-          footer: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            color: Colors.black54,
-            alignment: Alignment.bottomCenter,
-            child: Text(
-              '${character.name}',
-              style: TextStyle(
-                height: 1.3,
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+        child: Stack(
+          children: [
+            Hero(
+              tag: character.charId,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: character.image.isNotEmpty
+                    ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: FadeInImage.assetNetwork(
+                  width: double.infinity,
+                  height: double.infinity,
+                  placeholder: 'assets/images/loading.gif',
+                  image: character.image,
+                  fit: BoxFit.cover,
+                ),
+                    )
+                    : Image.asset('assets/images/placeholder.jpg'),
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              textAlign: TextAlign.center,
             ),
-          ),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                '${character.name}',
+                style: TextStyle(
+                  height: 1.3,
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
         ),
       ),
     );
