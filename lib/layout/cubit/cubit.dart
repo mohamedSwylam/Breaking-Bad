@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:breaking_bad/layout/cubit/states.dart';
 import 'package:breaking_bad/models/character%20_model.dart';
+import 'package:breaking_bad/models/quote_model.dart';
 import 'package:breaking_bad/shared/network/remote/web_services.dart';
 import 'package:breaking_bad/shared/network/remote/end_point.dart';
 import 'package:breaking_bad/shared/network/remote/repository.dart';
@@ -21,4 +22,6 @@ class AppCubit extends Cubit<AppStates> {
     });
     return characters;
   }
+   List<Quote> quotes = [];
+
 }

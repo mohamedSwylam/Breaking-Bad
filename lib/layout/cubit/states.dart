@@ -17,3 +17,16 @@ class GetCharactersErrorState extends AppStates {
 
   GetCharactersErrorState(this.error);
 }
+class GetQuotesLoadingState extends AppStates {}
+
+class GetQuotesSuccessState extends AppStates {
+  final List<CharacterModel> characters;
+
+  GetQuotesSuccessState(this.characters);
+}
+
+class GetGetQuotesSuccessStateErrorState extends AppStates {
+  final String error;
+
+  GetGetQuotesSuccessStateErrorState(this.error);
+}

@@ -28,6 +28,18 @@ class WebServices {
 
   }
 
+ Future<List<dynamic>> getQuotes() async {
+    try {
+      Response response = await dio.get(GET_CHARACTERS);
+      print(response.data.toString());
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+      return [];
+    }
+
+  }
+
 
 
 
