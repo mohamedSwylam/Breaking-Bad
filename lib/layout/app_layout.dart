@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:breaking_bad/models/character%20_model.dart';
+import 'package:breaking_bad/modules/search_screen.dart';
+import 'package:breaking_bad/shared/components/components.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:sizer/sizer.dart';
@@ -18,26 +20,35 @@ class AppLayout extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0.0,
+            actions: [
+              IconButton(onPressed: (){
+                navigateTo(context, SearchScreen());
+              }, icon: Icon(Icons.search)),
+            ],
           title: Text('Characters'),
-            backgroundColor: Colors.yellow[700],
           ),
-          body: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 2 / 3,
-              crossAxisSpacing: 1,
-              mainAxisSpacing: 1,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 2 / 3,
+                crossAxisSpacing: 1,
+                mainAxisSpacing: 1,
+              ),
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.zero,
+              itemCount: AppCubit
+                  .get(context)
+                  .characters
+                  .length,
+              itemBuilder: (context, index) {
+                return buildCharacterItem(AppCubit.get(context).characters[index]);
+              },
             ),
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.zero,
-            itemCount: AppCubit
-                .get(context)
-                .characters
-                .length,
-            itemBuilder: (context, index) {
-              return buildCharacterItem(AppCubit.get(context).characters[index]);
-            },
           ),
          );
       },
