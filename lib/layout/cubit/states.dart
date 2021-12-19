@@ -1,4 +1,5 @@
 import 'package:breaking_bad/models/character%20_model.dart';
+import 'package:breaking_bad/models/quote_model.dart';
 
 abstract class AppStates {}
 
@@ -20,13 +21,13 @@ class GetCharactersErrorState extends AppStates {
 class GetQuotesLoadingState extends AppStates {}
 
 class GetQuotesSuccessState extends AppStates {
-  final List<CharacterModel> characters;
+  final List<Quote> quotes;
 
-  GetQuotesSuccessState(this.characters);
+  GetQuotesSuccessState(this.quotes);
 }
 
-class GetGetQuotesSuccessStateErrorState extends AppStates {
+class GetQuotesErrorState extends AppStates {
   final String error;
 
-  GetGetQuotesSuccessStateErrorState(this.error);
+  GetQuotesErrorState(this.error);
 }

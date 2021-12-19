@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:breaking_bad/models/character%20_model.dart';
+import 'package:breaking_bad/modules/character_details_screen.dart';
 import 'package:breaking_bad/modules/search_screen.dart';
 import 'package:breaking_bad/shared/components/components.dart';
 import 'package:flutter_offline/flutter_offline.dart';
@@ -29,26 +30,41 @@ class AppLayout extends StatelessWidget {
             ],
           title: Text('Characters'),
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 2 / 3,
-                crossAxisSpacing: 1,
-                mainAxisSpacing: 1,
-              ),
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.zero,
-              itemCount: AppCubit
-                  .get(context)
-                  .characters
-                  .length,
-              itemBuilder: (context, index) {
-                return buildCharacterItem(AppCubit.get(context).characters[index]);
-              },
-            ),
+          body: OfflineBuilder(
+            connectivityBuilder: (
+                BuildContext context,
+                ConnectivityResult connectivity,
+                Widget child,
+                ) {
+              final bool connected = connectivity != ConnectivityResult.none;
+
+              if (connected) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 2 / 3,
+                      crossAxisSpacing: 1,
+                      mainAxisSpacing: 1,
+                    ),
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: AppCubit
+                        .get(context)
+                        .characters
+                        .length,
+                    itemBuilder: (context, index) {
+                      return buildCharacterItem(AppCubit.get(context).characters[index],context);
+                    },
+                  ),
+                );
+              } else {
+                return buildNoInternetWidget();
+              }
+            },
+            child: showLoadingIndicator(),
           ),
          );
       },
@@ -56,7 +72,7 @@ class AppLayout extends StatelessWidget {
   }
 }
 
-buildCharacterItem(CharacterModel character) =>
+buildCharacterItem(CharacterModel character,context) =>
     Container(
       width: double.infinity,
       margin: EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
@@ -66,7 +82,9 @@ buildCharacterItem(CharacterModel character) =>
         borderRadius: BorderRadius.circular(25),
       ),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          navigateTo(context,CharacterDetailsScreen(characterId: character.charId));
+        },
         child: Stack(
           children: [
             Hero(
@@ -119,6 +137,29 @@ Widget showLoadingIndicator() {
   return Center(
     child: CircularProgressIndicator(
       color: Colors.yellow,
+    ),
+  );
+}
+Widget buildNoInternetWidget() {
+  return Center(
+    child: Container(
+      color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            'Can\'t connect .. check internet',
+            style: TextStyle(
+              fontSize: 22,
+              color: Colors.black,
+            ),
+          ),
+          Image.asset('assets/images/no_internet.png')
+        ],
+      ),
     ),
   );
 }

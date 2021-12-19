@@ -1,42 +1,18 @@
 import 'dart:math';
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:breaking_bad/layout/cubit/cubit.dart';
 import 'package:breaking_bad/layout/cubit/states.dart';
-import 'package:breaking_bad/models/character%20_model.dart';
+import 'package:breaking_bad/shared/network/remote/repository.dart';
+import 'package:breaking_bad/shared/network/remote/web_services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CharacterDetailsScreen extends StatelessWidget {
-  final CharacterModel character;
+  final int characterId;
 
-  const CharacterDetailsScreen({Key key, this.character}) : super(key: key);
+  CharacterDetailsScreen({this.characterId});
 
-
-
-  Widget buildSliverAppBar() {
-    return SliverAppBar(
-      expandedHeight: 600,
-      pinned: true,
-      stretch: true,
-      backgroundColor: Colors.black,
-      flexibleSpace: FlexibleSpaceBar(
-        centerTitle: true,
-        title: Text(
-          character.nickName,
-          style: TextStyle(color: Colors.white),
-        ),
-        background: Hero(
-          tag: character.charId,
-          child: Image.network(
-            character.image,
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget characterInfo(String title, String value) {
     return RichText(
@@ -73,8 +49,8 @@ class CharacterDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget checkIfQuotesAreLoaded(CharactersState state) {
-    if (state is QuotesLoaded) {
+  Widget checkIfQuotesAreLoaded(AppStates state) {
+    if (state is GetQuotesSuccessState) {
       return displayRandomQuoteOrEmptySpace(state);
     } else {
       return showProgressIndicator();
@@ -122,64 +98,89 @@ class CharacterDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AppCubit,AppStates>(
-      listener: (context,state){},
-      builder: (context,state){
-        return  Scaffold(
-          backgroundColor: Colors.black,
-          body: CustomScrollView(
-            slivers: [
-              buildSliverAppBar(),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    Container(
-                      margin: EdgeInsets.fromLTRB(14, 14, 14, 0),
-                      padding: EdgeInsets.all(8),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          characterInfo('Job : ', character.jobs.join(' / ')),
-                          buildDivider(315),
-                          characterInfo(
-                              'Appeared in : ', character.categoryForTwoSeries),
-                          buildDivider(250),
-                          characterInfo('Seasons : ',
-                              character.appearanceOfSeasons.join(' / ')),
-                          buildDivider(280),
-                          characterInfo('Status : ', character.statusIfDeadOrAlive),
-                          buildDivider(300),
-                          character.betterCallSaulAppearance.isEmpty
-                              ? Container()
-                              : characterInfo('Better Call Saul Seasons : ',
-                              character.betterCallSaulAppearance.join(" / ")),
-                          character.betterCallSaulAppearance.isEmpty
-                              ? Container()
-                              : buildDivider(150),
-                          characterInfo('Actor/Actress : ', character.actorName),
-                          buildDivider(235),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          BlocBuilder<CharactersCubit, CharactersState>(
-                            builder: (context, state) {
-                              return checkIfQuotesAreLoaded(state);
-                            },
-                          ),
-                        ],
+    var charAttr = AppCubit.get(context).findByCharId(characterId);
+    return BlocProvider(
+      create: (BuildContext context) => AppCubit(Repository(WebServices()))..getQuotes(charAttr.name),
+      child: BlocConsumer<AppCubit, AppStates>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          return Scaffold(
+            backgroundColor: Colors.black,
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 300,
+                  pinned: true,
+                  stretch: true,
+                  backgroundColor: Colors.black,
+                  flexibleSpace: FlexibleSpaceBar(
+                    centerTitle: true,
+                    title: Text(
+                      charAttr.nickName,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    background: Hero(
+                      tag: charAttr.charId,
+                      child: Image.network(
+                        charAttr.image,
+                        fit: BoxFit.fill,
                       ),
                     ),
-                    SizedBox(
-                      height: 500,
-                    )
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      Container(
+                        margin: EdgeInsets.fromLTRB(14, 14, 14, 0),
+                        padding: EdgeInsets.all(8),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            characterInfo('Job : ', charAttr.jobs.join(' / ')),
+                            buildDivider(315),
+                            characterInfo(
+                                'Appeared in : ', charAttr.categoryForTwoSeries),
+                            buildDivider(250),
+                            characterInfo('Seasons : ',
+                                charAttr.appearanceOfSeasons.join(' / ')),
+                            buildDivider(280),
+                            characterInfo(
+                                'Status : ', charAttr.statusIfDeadOrAlive),
+                            buildDivider(300),
+                            charAttr.betterCallSaulAppearance.isEmpty
+                                ? Container()
+                                : characterInfo('Better Call Saul Seasons : ',
+                                charAttr.betterCallSaulAppearance.join(" / ")),
+                            charAttr.betterCallSaulAppearance.isEmpty
+                                ? Container()
+                                : buildDivider(150),
+                            characterInfo(
+                                'Actor/Actress : ', charAttr.actorName),
+                            buildDivider(235),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            BlocBuilder<AppCubit, AppStates>(
+                              builder: (context, state) {
+                                return checkIfQuotesAreLoaded(state);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 500,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -23,5 +23,14 @@ class AppCubit extends Cubit<AppStates> {
     return characters;
   }
    List<Quote> quotes = [];
-
+   List<Quote> getQuotes(String charName) {
+     charactersRepository.getQuotes(charName).then((quotes) {
+       emit(GetQuotesSuccessState(quotes));
+       this.quotes = quotes;
+     });
+     return quotes;
+   }
+   CharacterModel findByCharId(int charId) {
+     return characters.firstWhere((element) => element.charId == charId);
+   }
 }

@@ -28,9 +28,9 @@ class WebServices {
 
   }
 
- Future<List<dynamic>> getQuotes() async {
+ Future<List<dynamic>> getQuotes(String charName) async {
     try {
-      Response response = await dio.get(GET_CHARACTERS);
+      Response response = await dio.get(GET_Quotes,queryParameters:{'author': charName} );
       print(response.data.toString());
       return response.data;
     } catch (e) {
